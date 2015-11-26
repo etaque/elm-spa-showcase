@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
     "summary": "helpful summary of your project, less than 80 characters",
-    "repository": "https://github.com/etaque/real-world-elm.git",
+    "repository": "https://github.com/etaque/elm-spa-showcase.git",
     "license": "BSD3",
     "source-directories": [
         "src/elm"

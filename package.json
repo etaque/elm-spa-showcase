@@ -1,17 +1,22 @@
 {
   "name": "real-world-elm",
   "devDependencies": {
+    "node-sass": "3.3.3",
     "watch": "0.16.0",
     "http-server": "0.8.5"
   },
   "scripts": {
     "start": "npm run launch-server & npm run watch",
 
-    "watch": "watch 'npm run build --silent' src",
+    "watch": "npm run watch-elm & npm run watch-html & npm run watch-sass",
+    "watch-elm": "watch 'npm run build-elm --silent' src/elm",
+    "watch-html": "watch 'npm run build-html --silent' src/html",
+    "watch-sass": "watch 'npm run build-sass --silent' src/styles",
 
-    "build": "npm run build-elm & npm run build-html",
+    "build": "npm run build-elm & npm run build-html & npm run build-sass",
     "build-elm": "elm make src/elm/Main.elm --output dist/Main.js",
-    "build-html": "cp src/index.html dist/",
+    "build-html": "cp src/html/*.html dist/",
+    "build-sass": "node-sass -o dist/ src/styles/main.scss",
 
     "launch-server": "npm run kill-server && http-server ./dist -p 8080",
     "kill-server": "fuser -k 8080/tcp || true"
