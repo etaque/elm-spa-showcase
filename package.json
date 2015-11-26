@@ -1,0 +1,19 @@
+{
+  "name": "real-world-elm",
+  "devDependencies": {
+    "watch": "0.16.0",
+    "http-server": "0.8.5"
+  },
+  "scripts": {
+    "start": "npm run launch-server & npm run watch",
+
+    "watch": "watch 'npm run build --silent' src",
+
+    "build": "npm run build-elm & npm run build-html",
+    "build-elm": "elm make src/elm/Main.elm --output dist/Main.js",
+    "build-html": "cp src/index.html dist/",
+
+    "launch-server": "npm run kill-server && http-server ./dist -p 8080",
+    "kill-server": "fuser -k 8080/tcp || true"
+  }
+}
