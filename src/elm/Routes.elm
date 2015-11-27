@@ -26,8 +26,8 @@ toUrl : Route -> Url
 toUrl route =
   case route of
     Home -> "/"
-    Topic a -> path [ "topic", toString a ]
-    SubTopic a b -> path [ "topic", toString a, "subtopic", toString b ]
-    User s -> path [ "user", s ]
+    Topic a -> "/topic/" ++ toString a
+    SubTopic a b -> "/topic/" ++ toString a ++ "/subtopic" ++ toString b
+    User s -> "/user/" ++ s
     About -> "/about"
     NotFound -> "/404"
