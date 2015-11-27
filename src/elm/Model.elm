@@ -1,11 +1,14 @@
 module Model where
 
+import Time exposing (Time)
+
 import Routes exposing (Route)
 
 type alias Model =
   { user : User
   , cities : Cities
   , route: Route
+  , time: Time
   }
 
 type alias User =
@@ -23,6 +26,7 @@ type alias City =
 
 type Action =
   NoOp
+  | UpdateTime Time
   | UpdateNewCity String
   | AddNewCity
   | DeleteCity String

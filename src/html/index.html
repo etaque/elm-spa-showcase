@@ -1,18 +1,20 @@
 <!DOCTYPE HTML>
 <html>
 
-<head>
-  <meta charset="UTF-8">
-  <title>Elm</title>
-  <script type="text/javascript" src="Main.js"></script>
-  <link href="main.css" rel="stylesheet"/>
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <title>Elm-SPA-Showcase</title>
+    <script type="text/javascript" src="Main.js"></script>
+    <link href="main.css" rel="stylesheet"/>
+  </head>
 
-<body>
-</body>
+  <body>
+  </body>
 
-<script type="text/javascript">
-var elmApp = Elm.fullscreen(Elm.Main, {});
-</script>
+  <script type="text/javascript">
+    var elmApp = Elm.fullscreen(Elm.Main, {
+      time: new Date().getTime(),
+    });
+  </script>
 
 </html>

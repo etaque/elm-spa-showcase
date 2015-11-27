@@ -1,15 +1,16 @@
 module Update where
 
 import Effects exposing (Effects)
+import Time exposing (Time)
 
 import Model exposing (..)
 import Routes as R
 
-init : (Model, Effects Action)
-init = (initialModel, Effects.none)
+init : Time -> (Model, Effects Action)
+init time = (initialModel time, Effects.none)
 
-initialModel : Model
-initialModel =
+initialModel : Time -> Model
+initialModel time =
   { user = { name = "Tom" }
   , cities =
       { new = ""
@@ -21,6 +22,7 @@ initialModel =
           ]
       }
   , route = R.Home
+  , time = time
   }
 
 update : Action -> Model -> (Model, Effects Action)
@@ -28,6 +30,8 @@ update action model =
   case action of
     NoOp ->
       (model, Effects.none)
+    UpdateTime time ->
+      ({ model | time <- time}, Effects.none)
     UpdateNewCity city ->
       let cities = model.cities
           newModel =
