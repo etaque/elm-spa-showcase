@@ -4,7 +4,7 @@ import Routes exposing (Route)
 
 type alias Model =
   { user : User
-  , items : List Item
+  , cities : Cities
   , route: Route
   }
 
@@ -12,10 +12,17 @@ type alias User =
   { name : String
   }
 
-type alias Item =
+type alias Cities =
+  { new : String
+  , actual : List City
+  }
+
+type alias City =
   { name : String
   }
 
 type Action =
   NoOp
-  | DeleteItem String
+  | UpdateNewCity String
+  | AddNewCity
+  | DeleteCity String

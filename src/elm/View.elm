@@ -1,7 +1,8 @@
 module View where
 
 import Html exposing (..)
-import Html.Events exposing (onClick)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Signal exposing (..)
 import List
 
@@ -13,18 +14,37 @@ view addr model =
     []
     [ h1 [] [ text "Elm-SPA-Showcase" ]
     , h2 [] [ text "Cities" ]
-    , renderItems addr model.items
+    , renderCities addr model.cities
     ]
 
-renderItems : Address Action -> List Item -> Html
-renderItems addr items = ul [] (List.map (renderItem addr) items)
+renderCities : Address Action -> Cities -> Html
+renderCities addr cities =
+  div
+    []
+    [ newCity addr cities.new
+    , ul [] (List.map (renderCity addr) cities.actual)
+    ]
 
-renderItem : Address Action -> Item -> Html
-renderItem addr item =
+newCity : Address Action -> String -> Html
+newCity addr new =
+  div
+    []
+    [ input
+        [ on "input" targetValue (Signal.message addr << UpdateNewCity)
+        , value new
+        ]
+        []
+    , button
+        [ onClick addr AddNewCity ]
+        [ text "+" ]
+    ]
+
+renderCity : Address Action -> City -> Html
+renderCity addr city =
   li
     []
-    [ text item.name
+    [ text city.name
     , button
-        [ onClick addr (DeleteItem item.name)]
+        [ onClick addr (DeleteCity city.name)]
         [ text "x" ]
     ]

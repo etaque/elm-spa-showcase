@@ -11,12 +11,15 @@ init = (initialModel, Effects.none)
 initialModel : Model
 initialModel =
   { user = { name = "Tom" }
-  , items =
-      [ { name = "Paris" }
-      , { name = "Nantes" }
-      , { name = "Tokyo" }
-      , { name = "Bouguenais" }
-      ]
+  , cities =
+      { new = ""
+      , actual =
+          [ { name = "Paris" }
+          , { name = "Nantes" }
+          , { name = "Tokyo" }
+          , { name = "Bouguenais" }
+          ]
+      }
   , route = R.Home
   }
 
@@ -25,6 +28,32 @@ update action model =
   case action of
     NoOp ->
       (model, Effects.none)
-    DeleteItem itemName ->
-      let newModel = { model | items <- List.filter (\item -> item.name /= itemName) model.items }
+    UpdateNewCity city ->
+      let cities = model.cities
+          newModel =
+            { model
+            | cities <- { cities | new <- city }
+            }
+      in  (newModel, Effects.none)
+    AddNewCity ->
+      let cities = model.cities
+          newCity = { name = model.cities.new }
+          newModel =
+            { model
+            | cities <-
+                { cities
+                | new <- ""
+                , actual <- newCity :: cities.actual
+                }
+            }
+      in  (newModel, Effects.none)
+    DeleteCity city ->
+      let cities = model.cities
+          newModel =
+            { model
+            | cities <-
+                { cities
+                | actual <- List.filter ((/=) city << .name) model.cities.actual
+                }
+            }
       in  (newModel, Effects.none)
