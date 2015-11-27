@@ -40,6 +40,7 @@ type Page
   | ShowTopic (Maybe Topic)
   | ShowUser (Maybe User)
   | About
+  | NotFound
 
 
 type alias Topic =

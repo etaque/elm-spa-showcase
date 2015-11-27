@@ -32,10 +32,13 @@ initialModel time =
 update : Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
+
     NoOp ->
       (model, Effects.none)
+
     UpdateTime time ->
       ({ model | time <- time}, Effects.none)
+
     UpdateNewCity city ->
       let cities = model.cities
           newModel =
@@ -43,6 +46,7 @@ update action model =
             | cities <- { cities | new <- city }
             }
       in  (newModel, Effects.none)
+
     AddNewCity ->
       let cities = model.cities
           newCity = { name = model.cities.new }
@@ -55,6 +59,7 @@ update action model =
                 }
             }
       in  (newModel, Effects.none)
+
     DeleteCity city ->
       let cities = model.cities
           newModel =
@@ -65,12 +70,26 @@ update action model =
                 }
             }
       in  (newModel, Effects.none)
+
     UpdateUrl path ->
       (model, pushPath path)
+
     LatestRoute (Just route) ->
-      ({ model | route <- route }, Effects.none)
+      let
+        page = routeToPage route
+        newModel = { model | route <- route, page <- page }
+      in
+        (newModel, Effects.none)
+
     LatestRoute Nothing ->
-      ({ model | route <- R.NotFound }, Effects.none)
+      ({ model | route <- R.NotFound, page <- NotFound }, Effects.none)
+
+routeToPage : R.Route -> Page
+routeToPage route =
+  case route of
+    R.Home -> Home
+    R.About -> About
+    _ -> NotFound
 
 pushPath : String -> Effects Action
 pushPath path =
