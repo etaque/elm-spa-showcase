@@ -3,7 +3,7 @@
   "devDependencies": {
     "node-sass": "3.3.3",
     "watch": "0.16.0",
-    "http-server": "0.8.5"
+    "http-server-fallback": "0.8.5"
   },
   "scripts": {
     "start": "npm run launch-server & npm run watch",
@@ -18,7 +18,8 @@
     "build-html": "cp src/html/*.html dist/",
     "build-sass": "node-sass -o dist/ src/styles/main.scss",
 
-    "launch-server": "npm run kill-server && http-server ./dist -p 8080",
+    "launch-server": "npm run kill-server && npm run start-server",
+    "start-server": "./node_modules/http-server-fallback/bin/http-server ./dist -p 8080 -f index.html",
     "kill-server": "fuser -k 8080/tcp || true"
   }
 }
