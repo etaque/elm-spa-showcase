@@ -1,3 +1,16 @@
+@import url(http://fonts.googleapis.com/css?family=Inconsolata:400,700);
+
+body {
+  font-family: Inconsolata, mono;
+}
+
 h1, h2 {
   color: green;
+}
+
+.menu {
+  li.current {
+    font-weight: bold;
+    text-decoration: none;
+  }
 }

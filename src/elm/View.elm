@@ -11,25 +11,52 @@ import Json.Decode as Json
 import Model exposing (..)
 import Routes as R
 
-view : Address Action -> Model -> Html
+
+type alias Addr = Address Action
+
+
+view : Addr -> Model -> Html
 view addr model =
   div
     []
     [ h1 [] [ text "Elm-SPA-Showcase" ]
-    , h2 [] [ text "Cities" ]
-    , renderCities addr model.cities
-    , link addr R.About [ ] [ text "About" ]
+    , menu addr model.route
+    , renderPage addr model
     ]
 
-renderCities : Address Action -> Cities -> Html
+menu : Addr -> R.Route -> Html
+menu addr currentRoute =
+  let
+    item r label =
+      li
+        [ classList [ ("current", r == currentRoute) ] ]
+        [ link addr r [ ] [ text label ] ]
+  in
+    ul [ class "menu" ]
+      [ item R.Home "Homepage"
+      , item R.About "About"
+      ]
+
+renderPage : Addr -> Model -> Html
+renderPage addr model =
+  case model.page of
+    Home ->
+      renderCities addr model.cities
+    About ->
+      renderAbout
+    _ ->
+      renderNotFound
+
+renderCities : Addr -> Cities -> Html
 renderCities addr cities =
   div
     []
-    [ newCity addr cities.new
+    [ h2 [] [ text "Cities" ]
+    , newCity addr cities.new
     , ul [] (List.map (renderCity addr) cities.actual)
     ]
 
-newCity : Address Action -> String -> Html
+newCity : Addr -> String -> Html
 newCity addr new =
   div
     []
@@ -43,7 +70,7 @@ newCity addr new =
         [ text "+" ]
     ]
 
-renderCity : Address Action -> City -> Html
+renderCity : Addr -> City -> Html
 renderCity addr city =
   li
     []
@@ -53,10 +80,17 @@ renderCity addr city =
         [ text "x" ]
     ]
 
+renderAbout : Html
+renderAbout =
+  p [ ] [ text "About what?" ]
+
+renderNotFound : Html
+renderNotFound =
+  p [ ] [ text "100% not here." ]
 
 -- helpers
 
-link : Address Action -> R.Route -> List Attribute -> List Html -> Html
+link : Addr -> R.Route -> List Attribute -> List Html -> Html
 link addr route attrs content =
   let
     path = R.toUrl route
