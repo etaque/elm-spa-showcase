@@ -27,6 +27,7 @@ initialModel time =
             , { name = "Tokyo" }
             , { name = "Bouguenais" }
             ]
+            (1 * Time.second)
             (\x -> x.name)
       }
   , route = R.Home

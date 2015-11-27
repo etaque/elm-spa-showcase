@@ -76,10 +76,11 @@ newCity addr new =
         [ text "+" ]
     ]
 
-renderCity : Address (ListComponent.Action City) -> City -> Html
-renderCity addr city =
+renderCity : Address (ListComponent.Action City) -> Float -> City -> Html
+renderCity addr deleteAnimation city =
   li
-    []
+    [ style [ ("opacity", toString deleteAnimation) ]
+    ]
     [ text city.name
     , button
         [ onClick addr (ListComponent.Delete city)]

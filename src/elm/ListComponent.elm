@@ -19,6 +19,7 @@ type alias Model a comparable =
   { xs : List a
   , deleteAnimations : Dict comparable DeleteAnimation
   , getId : a -> comparable
+  , deleteDuration : Time
   }
 
 type alias DeleteAnimation =
@@ -26,14 +27,12 @@ type alias DeleteAnimation =
   , prevTime : Time
   }
 
-deleteDuration : Time
-deleteDuration = second
-
-init : List a -> (a -> comparable) -> (Model a comparable)
-init xs getId =
+init : List a -> Time -> (a -> comparable) -> (Model a comparable)
+init xs deleteDuration getId =
   { xs = xs
   , deleteAnimations = Dict.empty
   , getId = getId
+  , deleteDuration = deleteDuration
   }
 
 -- UPDATE
@@ -60,7 +59,7 @@ update action model =
             case Dict.get (model.getId x) model.deleteAnimations of
               Just deleting -> deleting.elapsedTime + (time - deleting.prevTime)
               Nothing -> 0
-      in  if newElapsedTime > deleteDuration
+      in  if newElapsedTime > model.deleteDuration
             then
               ( { model
                 | xs <- List.filter ((/=) x) model.xs
@@ -85,8 +84,16 @@ find x xs =
 
 -- VIEW
 
-view : Address (Action a) -> Model a comparable -> (Address (Action a) -> a -> Html) -> Html
+view : Address (Action a) -> Model a comparable -> (Address (Action a) -> Float -> a -> Html) -> Html
 view address model renderElem =
   ul
     []
-    (List.map (renderElem address) model.xs)
+    (List.map (\x -> renderElem address (deleteStep model x) x) model.xs)
+
+deleteStep : Model a comparable -> a -> Float
+deleteStep model x =
+  case Dict.get (model.getId x) model.deleteAnimations of
+    Just deleting ->
+      1.0 - deleting.elapsedTime / model.deleteDuration
+    Nothing ->
+      1.0
