@@ -11,6 +11,7 @@ import Json.Decode as Json
 import ListComponent
 import Model exposing (..)
 import Routes as R
+import Transit
 
 type alias Addr = Address Action
 
@@ -23,8 +24,8 @@ view addr model =
     , div
         [ classList
             [ ("page", True)
-            , ("exiting", model.pageStatus == Exiting)
-            , ("entering", model.pageStatus == Entering)
+            , ("exiting", Transit.isExiting model)
+            , ("entering", Transit.isEntering model)
             ]
         ]
         [ renderPage addr model ]

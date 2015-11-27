@@ -9,6 +9,8 @@ import ListComponent
 import Model exposing (..)
 import Routes as R
 import Router
+import Transit
+
 
 init : Time -> (Model, Effects Action)
 init time = (initialModel time, Effects.none)
@@ -28,7 +30,7 @@ initialModel time =
       }
   , route = R.Home
   , page = Home
-  , pageStatus = Entered
+  , transitStatus = Transit.Entered
   , time = time
   }
 
@@ -77,25 +79,24 @@ update action model =
 
     LatestRoute (Just route) ->
       let
-        exitTransition = routeToPage route
-          |> schedulePageEntering
-          |> Effects.task
-        newModel = { model | route <- route, pageStatus <- Exiting }
+        newPage = routeToPage route
+        newModel = { model | route <- route }
+
+        (transitedModel, transitEffect) = Transit.updateTransition 150 (Transit.GoTo newPage) newModel
+        effect = Effects.map TransitAction transitEffect
       in
-        (newModel, exitTransition)
+        (transitedModel, effect)
 
     LatestRoute Nothing ->
       ({ model | route <- R.NotFound, page <- NotFound }, Effects.none)
 
-    PageAction pageAction ->
-      case pageAction of
-        StartPageEnter page ->
-          let
-            enterTransition = Effects.task schedulePageEntered
-          in
-            ({ model | page <- page, pageStatus <- Entering }, enterTransition)
-        StopPageEnter ->
-          ({ model | pageStatus <- Entered }, Effects.none)
+    TransitAction transitAction ->
+      let
+        (newModel, transitEffect) = Transit.updateTransition 150 transitAction model
+        effect = Effects.map TransitAction transitEffect
+      in
+        (newModel, effect)
+
 
 routeToPage : R.Route -> Page
 routeToPage route =
@@ -104,15 +105,6 @@ routeToPage route =
     R.About -> About
     _ -> NotFound
 
-schedulePageEntering : Page -> Task.Task x Action
-schedulePageEntering page =
-  Task.sleep 150 `Task.andThen`
-    \_ -> Task.succeed (PageAction (StartPageEnter page))
-
-schedulePageEntered : Task.Task x Action
-schedulePageEntered =
-  Task.sleep 150 `Task.andThen`
-    \_ -> Task.succeed (PageAction StopPageEnter)
 
 pushPath : String -> Effects Action
 pushPath path =

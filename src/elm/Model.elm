@@ -4,14 +4,14 @@ import Time exposing (Time)
 
 import ListComponent
 import Routes exposing (Route)
+import Transit
 
-type alias Model =
+
+type alias Model = Transit.WithTransition Page
   { user : User
   , cities : Cities
   , route : Route
   , time : Time
-  , page : Page
-  , pageStatus : PageStatus
   }
 
 type alias User =
@@ -35,7 +35,7 @@ type Action =
   | AddNewCity
   | DeleteCity City
   | LatestRoute (Maybe Route)
-  | PageAction PageAction
+  | TransitAction (Transit.Action Page)
   | UpdateUrl String
 
 type Page =
@@ -44,15 +44,6 @@ type Page =
   | ShowUser (Maybe User)
   | About
   | NotFound
-
-type PageStatus =
-  Entering
-  | Entered
-  | Exiting
-
-type PageAction =
-  StartPageEnter Page
-  | StopPageEnter
 
 type alias Topic =
   { title : String
