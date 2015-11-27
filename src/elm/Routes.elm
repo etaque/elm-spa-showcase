@@ -1,11 +1,6 @@
 module Routes where
 
-import Router as R exposing (..)
-
-import Combine exposing (Parser, string, parse, end, andThen, many1, while, many, skip, maybe, Result (..))
-import Combine.Char exposing (noneOf, char)
-import Combine.Num exposing (int)
-import Combine.Infix exposing ((<$>), (<$), (<*), (*>), (<*>), (<|>))
+import Router exposing (..)
 
 
 type Route
@@ -17,7 +12,7 @@ type Route
   | NotFound
 
 
-routeParsers : List (Parser Route)
+routeParsers : Parsers Route
 routeParsers =
   [ static Home "/"
   , dyn1 Topic "/topic/" intParam ""

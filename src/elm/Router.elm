@@ -1,4 +1,4 @@
-module Router (path, pathMaybe, intParam, maybeIntParam, stringParam, static, dyn1, dyn2, match, Url) where
+module Router (path, pathMaybe, intParam, maybeIntParam, stringParam, static, dyn1, dyn2, dyn3, match, Url, Parsers) where
 
 import Combine exposing (Parser, string, parse, end, andThen, many1, while, many, skip, maybe, Result (..))
 import Combine.Char exposing (noneOf, char)
@@ -11,6 +11,8 @@ import List
 
 
 type alias Url = String
+type alias Parsers route = List (Parser route)
+
 
 intParam : Parser Int
 intParam = int

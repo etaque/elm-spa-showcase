@@ -3,6 +3,7 @@ module Update where
 import Effects exposing (Effects)
 
 import Model exposing (..)
+import Routes as R
 
 init : (Model, Effects Action)
 init = (initialModel, Effects.none)
@@ -16,6 +17,7 @@ initialModel =
       , { name = "Tokyo" }
       , { name = "Bouguenais" }
       ]
+  , route = R.Home
   }
 
 update : Action -> Model -> (Model, Effects Action)
