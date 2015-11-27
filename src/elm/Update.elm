@@ -27,6 +27,7 @@ initialModel time =
             , { name = "Tokyo" }
             , { name = "Bouguenais" }
             ]
+            (\x -> x.name)
       }
   , route = R.Home
   , page = Home

@@ -20,7 +20,7 @@ type alias User =
 
 type alias Cities =
   { new : String
-  , actual : ListComponent.Model City
+  , actual : ListComponent.Model City String
   }
 
 type alias City =
