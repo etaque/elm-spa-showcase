@@ -22,3 +22,4 @@ Single page application with:
 - Reusable components:
     - Minical (with native ?)
     - Suggests
+- Associate components to each route path

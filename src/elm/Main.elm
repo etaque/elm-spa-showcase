@@ -1,4 +1,3 @@
-
 import Effects exposing (Never)
 import StartApp
 import Task
@@ -6,7 +5,6 @@ import Task
 import Update exposing (init, update)
 import View exposing (view)
 import Routes
-
 
 app =
   StartApp.start
@@ -16,11 +14,7 @@ app =
     , inputs = []
     }
 
-
-main =
-  app.html
-
+main = app.html
 
 port tasks : Signal (Task.Task Never ())
-port tasks =
-  app.tasks
+port tasks = app.tasks
