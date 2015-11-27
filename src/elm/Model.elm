@@ -2,7 +2,6 @@ module Model where
 
 import Routes exposing (Route)
 
-
 type alias Model =
   { user : User
   , items : List Item
@@ -16,5 +15,7 @@ type alias User =
 type alias Item =
   { name : String
   }
-type Action
-  = NoOp
+
+type Action =
+  NoOp
+  | DeleteItem String

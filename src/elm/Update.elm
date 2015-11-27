@@ -21,4 +21,10 @@ initialModel =
   }
 
 update : Action -> Model -> (Model, Effects Action)
-update action model = (model, Effects.none)
+update action model =
+  case action of
+    NoOp ->
+      (model, Effects.none)
+    DeleteItem itemName ->
+      let newModel = { model | items <- List.filter (\item -> item.name /= itemName) model.items }
+      in  (newModel, Effects.none)
