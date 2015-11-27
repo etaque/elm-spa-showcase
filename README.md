@@ -22,4 +22,5 @@ Single page application with:
 - Reusable components:
     - Minical (with native ?)
     - Suggests
+    - Item list with deletion transition
 - Associate a component to each route path
