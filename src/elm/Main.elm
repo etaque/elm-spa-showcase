@@ -4,8 +4,8 @@ import Task
 import Time exposing (every, Time)
 import Signal
 
-import Update exposing (init, update)
 import Model exposing (Action(UpdateTime))
+import Update exposing (init, update, currentRouteSignal)
 import View exposing (view)
 import Routes
 
@@ -16,6 +16,7 @@ app =
     , view = view
     , inputs =
        [ Signal.map UpdateTime (every 100)
+       , currentRouteSignal
        ]
     }
 

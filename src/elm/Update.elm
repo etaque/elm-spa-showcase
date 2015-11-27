@@ -2,9 +2,12 @@ module Update where
 
 import Effects exposing (Effects)
 import Time exposing (Time)
+import History
+import Task
 
 import Model exposing (..)
 import Routes as R
+import Router
 
 init : Time -> (Model, Effects Action)
 init time = (initialModel time, Effects.none)
@@ -22,6 +25,7 @@ initialModel time =
           ]
       }
   , route = R.Home
+  , page = Home
   , time = time
   }
 
@@ -61,3 +65,19 @@ update action model =
                 }
             }
       in  (newModel, Effects.none)
+    UpdateUrl path ->
+      (model, pushPath path)
+    LatestRoute (Just route) ->
+      ({ model | route <- route }, Effects.none)
+    LatestRoute Nothing ->
+      ({ model | route <- R.NotFound }, Effects.none)
+
+pushPath : String -> Effects Action
+pushPath path =
+  History.setPath path
+    |> Task.map (\_ -> NoOp)
+    |> Effects.task
+
+currentRouteSignal : Signal Action
+currentRouteSignal =
+  Signal.map (LatestRoute << Router.match R.routeParsers) History.path

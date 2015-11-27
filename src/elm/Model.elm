@@ -9,6 +9,7 @@ type alias Model =
   , cities : Cities
   , route: Route
   , time: Time
+  , page: Page
   }
 
 type alias User =
@@ -30,3 +31,17 @@ type Action =
   | UpdateNewCity String
   | AddNewCity
   | DeleteCity String
+  | LatestRoute (Maybe Route)
+  | UpdateUrl String
+
+
+type Page
+  = Home
+  | ShowTopic (Maybe Topic)
+  | ShowUser (Maybe User)
+  | About
+
+
+type alias Topic =
+  { title : String
+  }
