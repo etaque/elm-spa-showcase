@@ -5,6 +5,7 @@ import Time exposing (Time)
 import History
 import Task
 
+import ListComponent
 import Model exposing (..)
 import Routes as R
 import Router
@@ -18,11 +19,12 @@ initialModel time =
   , cities =
       { new = ""
       , actual =
-          [ { name = "Paris" }
-          , { name = "Nantes" }
-          , { name = "Tokyo" }
-          , { name = "Bouguenais" }
-          ]
+          ListComponent.init
+            [ { name = "Paris" }
+            , { name = "Nantes" }
+            , { name = "Tokyo" }
+            , { name = "Bouguenais" }
+            ]
       }
   , route = R.Home
   , page = Home
@@ -48,30 +50,28 @@ update action model =
             }
       in  (newModel, Effects.none)
 
+    UpdateCities citiesAction ->
+      let cities = model.cities
+          (newActualCities, effects) = ListComponent.update citiesAction cities.actual
+          newModel =
+            { model
+            | cities <- { cities | actual <- newActualCities }
+            }
+      in  (newModel, Effects.map UpdateCities effects)
+
     AddNewCity ->
       let cities = model.cities
           newCity = { name = model.cities.new }
+          (newActualCities, effects) = ListComponent.update (ListComponent.Add newCity) cities.actual
           newModel =
             { model
             | cities <-
                 { cities
                 | new <- ""
-                , actual <- newCity :: cities.actual
+                , actual <- newActualCities
                 }
             }
-      in  (newModel, Effects.none)
-
-    DeleteCity city ->
-      let cities = model.cities
-          newModel =
-            { model
-            | cities <-
-                { cities
-                | actual <- List.filter ((/=) city << .name) model.cities.actual
-                }
-            }
-      in  (newModel, Effects.none)
-
+      in  (newModel, Effects.map UpdateCities effects)
     UpdateUrl path ->
       (model, pushPath path)
 

@@ -2,6 +2,7 @@ module Model where
 
 import Time exposing (Time)
 
+import ListComponent
 import Routes exposing (Route)
 
 type alias Model =
@@ -19,7 +20,7 @@ type alias User =
 
 type alias Cities =
   { new : String
-  , actual : List City
+  , actual : ListComponent.Model City
   }
 
 type alias City =
@@ -30,28 +31,27 @@ type Action =
   NoOp
   | UpdateTime Time
   | UpdateNewCity String
+  | UpdateCities (ListComponent.Action City)
   | AddNewCity
-  | DeleteCity String
+  | DeleteCity City
   | LatestRoute (Maybe Route)
   | PageAction PageAction
   | UpdateUrl String
 
-
-type Page
-  = Home
+type Page =
+  Home
   | ShowTopic (Maybe Topic)
   | ShowUser (Maybe User)
   | About
   | NotFound
 
-
-type PageStatus
-  = Entering
+type PageStatus =
+  Entering
   | Entered
   | Exiting
 
-type PageAction
-  = StartPageEnter Page
+type PageAction =
+  StartPageEnter Page
   | StopPageEnter
 
 type alias Topic =

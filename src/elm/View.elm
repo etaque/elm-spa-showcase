@@ -8,12 +8,11 @@ import Signal exposing (..)
 import List
 import Json.Decode as Json
 
+import ListComponent
 import Model exposing (..)
 import Routes as R
 
-
 type alias Addr = Address Action
-
 
 view : Addr -> Model -> Html
 view addr model =
@@ -33,17 +32,15 @@ view addr model =
 
 menu : Addr -> R.Route -> Html
 menu addr currentRoute =
-  let
-    item r label =
-      li
-        [ classList [ ("current", r == currentRoute) ] ]
-        [ link addr r [ ] [ text label ] ]
-  in
-    ul
-      [ class "menu" ]
-      [ item R.Home "Homepage"
-      , item R.About "About"
-      ]
+  let item r label =
+        li
+          [ classList [ ("current", r == currentRoute) ] ]
+          [ link addr r [ ] [ text label ] ]
+  in  ul
+        [ class "menu" ]
+        [ item R.Home "Homepage"
+        , item R.About "About"
+        ]
 
 renderPage : Addr -> Model -> Html
 renderPage addr model =
@@ -61,7 +58,7 @@ renderCities addr cities =
     []
     [ h2 [] [ text "Cities" ]
     , newCity addr cities.new
-    , ul [] (List.map (renderCity addr) cities.actual)
+    , ListComponent.view (Signal.forwardTo addr UpdateCities) cities.actual renderCity
     ]
 
 newCity : Addr -> String -> Html
@@ -78,13 +75,13 @@ newCity addr new =
         [ text "+" ]
     ]
 
-renderCity : Addr -> City -> Html
+renderCity : Address (ListComponent.Action City) -> City -> Html
 renderCity addr city =
   li
     []
     [ text city.name
     , button
-        [ onClick addr (DeleteCity city.name)]
+        [ onClick addr (ListComponent.Delete city)]
         [ text "x" ]
     ]
 

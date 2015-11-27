@@ -1,12 +1,13 @@
 module ListComponent
   ( Model
   , init
-  , Action
+  , Action(..)
   , update
-  -- , view
+  , view
   ) where
 
 import Html exposing (..)
+import Signal exposing (Address)
 import List
 import Effects exposing (Effects)
 
@@ -27,7 +28,7 @@ type Action a =
   Add a
   | Delete a
 
-update : Action a -> Model a -> (Model a, Effects Action)
+update : Action a -> Model a -> (Model a, Effects (Action a))
 update action model =
   case action of
     Add x ->
@@ -39,8 +40,8 @@ update action model =
 
 -- VIEW
 
-view : Signal.Address Action -> Model a -> (a -> Html) -> Html
+view : Address (Action a) -> Model a -> (Address (Action a) -> a -> Html) -> Html
 view address model renderElem =
   ul
     []
-    (List.map renderElem model.xs)
+    (List.map (renderElem address) model.xs)
