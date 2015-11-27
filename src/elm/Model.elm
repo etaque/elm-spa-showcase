@@ -7,9 +7,10 @@ import Routes exposing (Route)
 type alias Model =
   { user : User
   , cities : Cities
-  , route: Route
-  , time: Time
-  , page: Page
+  , route : Route
+  , time : Time
+  , page : Page
+  , pageStatus : PageStatus
   }
 
 type alias User =
@@ -32,6 +33,7 @@ type Action =
   | AddNewCity
   | DeleteCity String
   | LatestRoute (Maybe Route)
+  | PageAction PageAction
   | UpdateUrl String
 
 
@@ -42,6 +44,15 @@ type Page
   | About
   | NotFound
 
+
+type PageStatus
+  = Entering
+  | Entered
+  | Exiting
+
+type PageAction
+  = StartPageEnter Page
+  | StopPageEnter
 
 type alias Topic =
   { title : String

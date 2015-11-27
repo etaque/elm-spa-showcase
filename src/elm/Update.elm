@@ -26,6 +26,7 @@ initialModel time =
       }
   , route = R.Home
   , page = Home
+  , pageStatus = Entered
   , time = time
   }
 
@@ -76,13 +77,25 @@ update action model =
 
     LatestRoute (Just route) ->
       let
-        page = routeToPage route
-        newModel = { model | route <- route, page <- page }
+        exitTransition = routeToPage route
+          |> schedulePageEntering
+          |> Effects.task
+        newModel = { model | route <- route, pageStatus <- Exiting }
       in
-        (newModel, Effects.none)
+        (newModel, exitTransition)
 
     LatestRoute Nothing ->
       ({ model | route <- R.NotFound, page <- NotFound }, Effects.none)
+
+    PageAction pageAction ->
+      case pageAction of
+        StartPageEnter page ->
+          let
+            enterTransition = Effects.task schedulePageEntered
+          in
+            ({ model | page <- page, pageStatus <- Entering }, enterTransition)
+        StopPageEnter ->
+          ({ model | pageStatus <- Entered }, Effects.none)
 
 routeToPage : R.Route -> Page
 routeToPage route =
@@ -90,6 +103,16 @@ routeToPage route =
     R.Home -> Home
     R.About -> About
     _ -> NotFound
+
+schedulePageEntering : Page -> Task.Task x Action
+schedulePageEntering page =
+  Task.sleep 150 `Task.andThen`
+    \_ -> Task.succeed (PageAction (StartPageEnter page))
+
+schedulePageEntered : Task.Task x Action
+schedulePageEntered =
+  Task.sleep 150 `Task.andThen`
+    \_ -> Task.succeed (PageAction StopPageEnter)
 
 pushPath : String -> Effects Action
 pushPath path =

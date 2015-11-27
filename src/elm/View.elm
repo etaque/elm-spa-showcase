@@ -18,10 +18,17 @@ type alias Addr = Address Action
 view : Addr -> Model -> Html
 view addr model =
   div
-    []
+    [ ]
     [ h1 [] [ text "Elm-SPA-Showcase" ]
     , menu addr model.route
-    , renderPage addr model
+    , div
+        [ classList
+            [ ("page", True)
+            , ("exiting", model.pageStatus == Exiting)
+            , ("entering", model.pageStatus == Entering)
+            ]
+        ]
+        [ renderPage addr model ]
     ]
 
 menu : Addr -> R.Route -> Html
@@ -32,7 +39,8 @@ menu addr currentRoute =
         [ classList [ ("current", r == currentRoute) ] ]
         [ link addr r [ ] [ text label ] ]
   in
-    ul [ class "menu" ]
+    ul
+      [ class "menu" ]
       [ item R.Home "Homepage"
       , item R.About "About"
       ]

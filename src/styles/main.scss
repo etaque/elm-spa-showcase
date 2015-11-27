@@ -1,7 +1,19 @@
-@import url(http://fonts.googleapis.com/css?family=Inconsolata:400,700);
+@import url("http://fonts.googleapis.com/css?family=Inconsolata:400,700");
 
 body {
   font-family: Inconsolata, mono;
+}
+
+.page {
+  opacity: 1;
+  transition: opacity 0.15s ease-in-out;
+
+  &.entering {
+  }
+
+  &.exiting {
+    opacity: 0;
+  }
 }
 
 h1, h2 {
