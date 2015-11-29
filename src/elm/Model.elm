@@ -7,11 +7,12 @@ import Routes exposing (Route)
 import Transit
 
 
-type alias Model = Transit.WithTransition Page
+type alias Model = Transit.WithTransition
   { user : User
   , cities : Cities
   , route : Route
   , time : Time
+  , page : Page
   }
 
 type alias User =
@@ -35,7 +36,7 @@ type Action =
   | AddNewCity
   | DeleteCity City
   | LatestRoute (Maybe Route)
-  | TransitAction (Transit.Action Page)
+  | TransitAction (Transit.Action Model)
   | UpdateUrl String
 
 type Page =
