@@ -5,10 +5,11 @@ import Time exposing (Time)
 import History
 import Task
 
+import RouteParser
+
 import ListComponent
 import Model exposing (..)
 import Routes as R
-import Router
 import Transit
 
 
@@ -44,13 +45,13 @@ update action model =
       (model, Effects.none)
 
     UpdateTime time ->
-      ({ model | time <- time}, Effects.none)
+      ({ model | time = time}, Effects.none)
 
     UpdateNewCity city ->
       let cities = model.cities
           newModel =
             { model
-            | cities <- { cities | new <- city }
+            | cities = { cities | new = city }
             }
       in  (newModel, Effects.none)
 
@@ -59,7 +60,7 @@ update action model =
           (newActualCities, effects) = ListComponent.update citiesAction cities.actual
           newModel =
             { model
-            | cities <- { cities | actual <- newActualCities }
+            | cities = { cities | actual = newActualCities }
             }
       in  (newModel, Effects.map UpdateCities effects)
 
@@ -69,32 +70,35 @@ update action model =
           (newActualCities, effects) = ListComponent.update (ListComponent.Add newCity) cities.actual
           newModel =
             { model
-            | cities <-
+            | cities =
                 { cities
-                | new <- ""
-                , actual <- newActualCities
+                | new = ""
+                , actual = newActualCities
                 }
             }
       in  (newModel, Effects.map UpdateCities effects)
+
+    DeleteCity c ->
+      (model, Effects.none)
+
     UpdateUrl path ->
       (model, pushPath path)
 
     LatestRoute (Just route) ->
       let
-        newPage = routeToPage route
-        newModel = { model | route <- route }
+        newModel = { model | route = route }
+        pageUpdate = (\m -> { m | page = routeToPage route })
 
-        (transitedModel, transitEffect) = Transit.updateTransition 150 (Transit.GoTo newPage) newModel
-        effect = Effects.map TransitAction transitEffect
+        effect = Effects.map TransitAction (Transit.init pageUpdate 150)
       in
-        (transitedModel, effect)
+        (newModel, effect)
 
     LatestRoute Nothing ->
-      ({ model | route <- R.NotFound, page <- NotFound }, Effects.none)
+      ({ model | route = R.NotFound, page = NotFound }, Effects.none)
 
     TransitAction transitAction ->
       let
-        (newModel, transitEffect) = Transit.updateTransition 150 transitAction model
+        (newModel, transitEffect) = Transit.update transitAction model
         effect = Effects.map TransitAction transitEffect
       in
         (newModel, effect)
@@ -116,4 +120,4 @@ pushPath path =
 
 currentRouteSignal : Signal Action
 currentRouteSignal =
-  Signal.map (LatestRoute << Router.match R.routeParsers) History.path
+  Signal.map (LatestRoute << RouteParser.match R.routeParsers) History.path

@@ -46,7 +46,7 @@ update : Action a -> Model a comparable -> (Model a comparable, Effects (Action 
 update action model =
   case action of
     Add x ->
-      let newModel = { model | xs <- x :: model.xs }
+      let newModel = { model | xs = x :: model.xs }
       in  (newModel, Effects.none)
     Delete x ->
       case Dict.get (model.getId x) model.deleteAnimations of
@@ -62,8 +62,8 @@ update action model =
       in  if newElapsedTime > model.deleteDuration
             then
               ( { model
-                | xs <- List.filter ((/=) x) model.xs
-                , deleteAnimations <- Dict.remove (model.getId x) model.deleteAnimations
+                | xs = List.filter ((/=) x) model.xs
+                , deleteAnimations = Dict.remove (model.getId x) model.deleteAnimations
                 }
               , Effects.none
               )
@@ -72,7 +72,7 @@ update action model =
                     { elapsedTime = newElapsedTime
                     , prevTime = time
                     }
-              in  ( { model | deleteAnimations <- Dict.update (model.getId x) (\_ -> Just deleteAnimation) model.deleteAnimations}
+              in  ( { model | deleteAnimations = Dict.update (model.getId x) (\_ -> Just deleteAnimation) model.deleteAnimations}
                   , Effects.tick (Deleting x)
                   )
 

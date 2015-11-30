@@ -22,12 +22,7 @@ view addr model =
     [ h1 [] [ text "Elm-SPA-Showcase" ]
     , menu addr model.route
     , div
-        [ classList
-            [ ("page", True)
-            , ("exiting", Transit.isExiting model)
-            , ("entering", Transit.isEntering model)
-            ]
-        ]
+        [ class <| "page " ++ (Transit.statusName model) ]
         [ renderPage addr model ]
     ]
 
