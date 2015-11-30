@@ -5,10 +5,11 @@ import Time exposing (Time)
 import History
 import Task
 
+import RouteParser
+
 import ListComponent
 import Model exposing (..)
 import Routes as R
-import Router
 import Transit
 
 
@@ -119,4 +120,4 @@ pushPath path =
 
 currentRouteSignal : Signal Action
 currentRouteSignal =
-  Signal.map (LatestRoute << Router.match R.routeParsers) History.path
+  Signal.map (LatestRoute << RouteParser.match R.routeParsers) History.path

@@ -1,6 +1,6 @@
 module Routes where
 
-import Router exposing (..)
+import RouteParser exposing (..)
 
 
 type Route
@@ -15,9 +15,9 @@ type Route
 routeParsers : Parsers Route
 routeParsers =
   [ static Home "/"
-  , dyn1 Topic "/topic/" intParam ""
-  , dyn2 SubTopic "/topic/" intParam "/" intParam ""
-  , dyn1 User "/user/" stringParam ""
+  , dyn1 Topic "/topic/" int ""
+  , dyn2 SubTopic "/topic/" int "/" int ""
+  , dyn1 User "/user/" string ""
   , static About "/about"
   ]
 
