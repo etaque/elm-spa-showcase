@@ -1,28 +1,32 @@
-import Effects exposing (Never)
-import StartApp
-import Task
-import Time exposing (every, Time)
-import Signal
+module Main where
 
-import Model exposing (Action(UpdateTime))
-import Update exposing (init, update, currentRouteSignal)
+import Effects exposing (Never)
+import Task
+import Signal
+import StartApp
+
+import Action exposing (..)
+import Update exposing (init, update)
 import View exposing (view)
-import Routes
+import Inputs exposing (actions)
+
+
+port initialPath : String
+
 
 app =
   StartApp.start
-    { init = init time
+    { init = init initialPath
     , update = update
     , view = view
-    , inputs =
-       [ Signal.map UpdateTime (every 100)
-       , currentRouteSignal
-       ]
+    , inputs = [ Inputs.actions ]
     }
 
-main = app.html
+
+main =
+  app.html
+
 
 port tasks : Signal (Task.Task Never ())
-port tasks = app.tasks
-
-port time : Time
+port tasks =
+  app.tasks

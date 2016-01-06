@@ -3,7 +3,7 @@
 
   <head>
     <meta charset="UTF-8">
-    <title>Elm-SPA-Showcase</title>
+    <title>Elm-Vespa</title>
     <script type="text/javascript" src="Main.js"></script>
     <link href="main.css" rel="stylesheet"/>
   </head>
@@ -12,9 +12,7 @@
   </body>
 
   <script type="text/javascript">
-    var elmApp = Elm.fullscreen(Elm.Main, {
-      time: new Date().getTime(),
-    });
+    var elmApp = Elm.fullscreen(Elm.Main, {initialPath: window.location.pathname});
   </script>
 
 </html>

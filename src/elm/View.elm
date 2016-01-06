@@ -5,107 +5,89 @@ import Html.Events exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Signal exposing (..)
-import List
 import Json.Decode as Json
 
-import ListComponent
+import TransitStyle
+import TransitRouter exposing (getTransition)
+
 import Model exposing (..)
-import Routes as R
-import Transit
+import Action exposing (..)
+import Routes exposing (..)
 
-type alias Addr = Address Action
+import Pages.Home.View as Home
+import Pages.Cities.View as Cities
 
-view : Addr -> Model -> Html
-view addr model =
+import Action exposing (PageAction)
+
+
+view : Address Action -> Model -> Html
+view _ model =
   div
     [ ]
-    [ h1 [] [ text "Elm-SPA-Showcase" ]
-    , menu addr model.route
+    [ h1 [] [ text "Elm Vespa" ]
+    , menu (TransitRouter.getRoute model)
     , div
-        [ class <| "page " ++ (Transit.statusName model) ]
-        [ renderPage addr model ]
+        [ class "page"
+        , style (TransitStyle.fadeSlideLeft 100 (getTransition model))
+        ]
+        [ renderPage model ]
     ]
 
-menu : Addr -> R.Route -> Html
-menu addr currentRoute =
-  let item r label =
-        li
-          [ classList [ ("current", r == currentRoute) ] ]
-          [ link addr r [ ] [ text label ] ]
-  in  ul
-        [ class "menu" ]
-        [ item R.Home "Homepage"
-        , item R.About "About"
-        ]
 
-renderPage : Addr -> Model -> Html
-renderPage addr model =
-  case model.page of
+menu : Route -> Html
+menu currentRoute =
+  let
+    item r label =
+      li
+        [ classList [ ("current", r == currentRoute) ] ]
+        [ a (clickTo (Routes.toPath r)) [ text label ] ]
+  in
+    ul
+      [ class "menu" ]
+      [ item Home "Homepage"
+      , item Cities "Cities"
+      , item About "About"
+      ]
+
+
+renderPage : Model -> Html
+renderPage model =
+  case (TransitRouter.getRoute model) of
+
     Home ->
-      renderCities addr model.cities
+      Home.view model.pages.home
+
+    Cities ->
+      Cities.view model.pages.cities
+
     About ->
       renderAbout
-    _ ->
+
+    NotFound ->
       renderNotFound
 
-renderCities : Addr -> Cities -> Html
-renderCities addr cities =
-  div
-    []
-    [ h2 [] [ text "Cities" ]
-    , newCity addr cities.new
-    , ListComponent.view (Signal.forwardTo addr UpdateCities) cities.actual renderCity
-    ]
+    EmptyRoute ->
+      text ""
 
-newCity : Addr -> String -> Html
-newCity addr new =
-  div
-    []
-    [ input
-        [ on "input" targetValue (Signal.message addr << UpdateNewCity)
-        , value new
-        ]
-        []
-    , button
-        [ onClick addr AddNewCity ]
-        [ text "+" ]
-    ]
-
-renderCity : Address (ListComponent.Action City) -> Float -> City -> Html
-renderCity addr deleteAnimation city =
-  li
-    [ style [ ("opacity", toString deleteAnimation) ]
-    ]
-    [ text city.name
-    , button
-        [ onClick addr (ListComponent.Delete city)]
-        [ text "x" ]
-    ]
 
 renderAbout : Html
 renderAbout =
   p [ ] [ text "About what?" ]
 
+
 renderNotFound : Html
 renderNotFound =
   p [ ] [ text "100% not here." ]
 
+
 -- helpers
 
-link : Addr -> R.Route -> List Attribute -> List Html -> Html
-link addr route attrs content =
-  let
-    path = R.toUrl route
-    linkAttrs =
-      [ href path
-      , onClickRoute addr (UpdateUrl path)
-      ]
-  in
-    a (linkAttrs ++ attrs) content
-
-onClickRoute : Address a -> a -> Attribute
-onClickRoute address msg =
-  onWithOptions
-    "click"
-    { stopPropagation = True, preventDefault = True }
-    Json.value (\_ -> message address msg)
+clickTo : String -> List Attribute
+clickTo path =
+  [ href path
+  , onWithOptions
+      "click"
+      { stopPropagation = True, preventDefault = True }
+      Json.value
+      (\_ -> message TransitRouter.pushPathAddress path)
+  ]

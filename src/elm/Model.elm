@@ -1,51 +1,27 @@
 module Model where
 
-import Time exposing (Time)
+import TransitRouter exposing (WithRoute)
 
-import ListComponent
 import Routes exposing (Route)
-import Transit
+import Pages.Home.Model as Home
+import Pages.Cities.Model as Cities
 
 
-type alias Model = Transit.WithTransition
+type alias Model = WithRoute Route
   { user : User
-  , cities : Cities
-  , route : Route
-  , time : Time
-  , page : Page
+  , pages : Pages
   }
 
 type alias User =
   { name : String
   }
 
-type alias Cities =
-  { new : String
-  , actual : ListComponent.Model City String
+type alias Pages =
+  { home : Home.Model
+  , cities : Cities.Model
   }
-
-type alias City =
-  { name : String
-  }
-
-type Action =
-  NoOp
-  | UpdateTime Time
-  | UpdateNewCity String
-  | UpdateCities (ListComponent.Action City)
-  | AddNewCity
-  | DeleteCity City
-  | LatestRoute (Maybe Route)
-  | TransitAction (Transit.Action Model)
-  | UpdateUrl String
-
-type Page =
-  Home
-  | ShowTopic (Maybe Topic)
-  | ShowUser (Maybe User)
-  | About
-  | NotFound
 
 type alias Topic =
   { title : String
   }
+

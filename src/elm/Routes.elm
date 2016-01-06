@@ -5,29 +5,40 @@ import RouteParser exposing (..)
 
 type Route
   = Home
-  | Topic Int
-  | SubTopic Int Int
-  | User String
+  | Cities
+  -- | Topic Int
+  -- | SubTopic Int Int
+  -- | User String
   | About
   | NotFound
+  | EmptyRoute
 
 
-routeParsers : Parsers Route
+routeParsers : List (Matcher Route)
 routeParsers =
   [ static Home "/"
-  , dyn1 Topic "/topic/" int ""
-  , dyn2 SubTopic "/topic/" int "/" int ""
-  , dyn1 User "/user/" string ""
+  , static Cities "/cities"
+  -- , dyn1 Topic "/topic/" int ""
+  -- , dyn2 SubTopic "/topic/" int "/" int ""
+  -- , dyn1 User "/user/" string ""
   , static About "/about"
   ]
 
 
-toUrl : Route -> Url
-toUrl route =
+fromPath : String -> Route
+fromPath path =
+  RouteParser.match routeParsers path
+    |> Maybe.withDefault NotFound
+
+
+toPath : Route -> String
+toPath route =
   case route of
     Home -> "/"
-    Topic a -> "/topic/" ++ toString a
-    SubTopic a b -> "/topic/" ++ toString a ++ "/" ++ toString b
-    User s -> "/user/" ++ s
+    Cities -> "/cities"
+    -- Topic a -> "/topic/" ++ toString a
+    -- SubTopic a b -> "/topic/" ++ toString a ++ "/" ++ toString b
+    -- User s -> "/user/" ++ s
     About -> "/about"
     NotFound -> "/404"
+    EmptyRoute -> ""

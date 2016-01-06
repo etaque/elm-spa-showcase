@@ -18,6 +18,8 @@
     "build-html": "cp src/html/*.html dist/",
     "build-sass": "node-sass -o dist/ src/styles/main.scss",
 
+    "clean-elm": "rm -rf elm-stuff/build-artifacts/0.16.0/etaque/elm-spa-showcase/",
+
     "launch-server": "npm run kill-server && npm run start-server",
     "start-server": "./node_modules/http-server-fallback/bin/http-server ./dist -p 8080 -f index.html",
     "kill-server": "fuser -k 8080/tcp || true"

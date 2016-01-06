@@ -1,123 +1,85 @@
 module Update where
 
-import Effects exposing (Effects)
-import Time exposing (Time)
-import History
-import Task
+import Effects exposing (Effects, none)
+import Response exposing (..)
+import TransitRouter
 
-import RouteParser
-
-import ListComponent
 import Model exposing (..)
-import Routes as R
-import Transit
+import Action exposing (..)
+import Routes exposing (..)
+
+import Pages.Home.Update as Home
+import Pages.Cities.Update as Cities
 
 
-init : Time -> (Model, Effects Action)
-init time = (initialModel time, Effects.none)
-
-initialModel : Time -> Model
-initialModel time =
-  { user = { name = "Tom" }
-  , cities =
-      { new = ""
-      , actual =
-          ListComponent.init
-            [ { name = "Paris" }
-            , { name = "Nantes" }
-            , { name = "Tokyo" }
-            , { name = "Bouguenais" }
-            ]
-            (1 * Time.second)
-            (\x -> x.name)
-      }
-  , route = R.Home
-  , page = Home
-  , transitStatus = Transit.Entered
-  , time = time
+initialModel : Model
+initialModel =
+  { transitRouter = TransitRouter.empty EmptyRoute
+  , user = { name = "" }
+  , pages =
+    { home = Home.initial
+    , cities = Cities.initial
+    }
   }
 
-update : Action -> Model -> (Model, Effects Action)
+
+routerConfig : TransitRouter.Config Route Action Model
+routerConfig =
+  { mountRoute = mountRoute
+  , getDurations = \_ _ _ -> (50, 200)
+  , actionWrapper = RouterAction
+  , routeDecoder = Routes.fromPath
+  }
+
+
+init : String -> Response Model Action
+init path =
+  TransitRouter.init routerConfig path initialModel
+
+
+update : Action -> Model -> Response Model Action
 update action model =
   case action of
 
     NoOp ->
-      (model, Effects.none)
+      (model, none)
 
-    UpdateTime time ->
-      ({ model | time = time}, Effects.none)
+    RouterAction routeAction ->
+      TransitRouter.update routerConfig routeAction model
 
-    UpdateNewCity city ->
-      let cities = model.cities
-          newModel =
-            { model
-            | cities = { cities | new = city }
-            }
-      in  (newModel, Effects.none)
-
-    UpdateCities citiesAction ->
-      let cities = model.cities
-          (newActualCities, effects) = ListComponent.update citiesAction cities.actual
-          newModel =
-            { model
-            | cities = { cities | actual = newActualCities }
-            }
-      in  (newModel, Effects.map UpdateCities effects)
-
-    AddNewCity ->
-      let cities = model.cities
-          newCity = { name = model.cities.new }
-          (newActualCities, effects) = ListComponent.update (ListComponent.Add newCity) cities.actual
-          newModel =
-            { model
-            | cities =
-                { cities
-                | new = ""
-                , actual = newActualCities
-                }
-            }
-      in  (newModel, Effects.map UpdateCities effects)
-
-    DeleteCity c ->
-      (model, Effects.none)
-
-    UpdateUrl path ->
-      (model, pushPath path)
-
-    LatestRoute (Just route) ->
-      let
-        newModel = { model | route = route }
-        pageUpdate = (\m -> { m | page = routeToPage route })
-
-        effect = Effects.map TransitAction (Transit.init pageUpdate 150)
-      in
-        (newModel, effect)
-
-    LatestRoute Nothing ->
-      ({ model | route = R.NotFound, page = NotFound }, Effects.none)
-
-    TransitAction transitAction ->
-      let
-        (newModel, transitEffect) = Transit.update transitAction model
-        effect = Effects.map TransitAction transitEffect
-      in
-        (newModel, effect)
+    PageAction pageAction ->
+      updatePage pageAction model.pages
+        |> mapBoth (\pages -> { model | pages = pages }) PageAction
 
 
-routeToPage : R.Route -> Page
-routeToPage route =
-  case route of
-    R.Home -> Home
-    R.About -> About
-    _ -> NotFound
+mountRoute : Route -> Route -> Model -> Response Model Action
+mountRoute prevRoute route ({pages} as model) =
+  mapBoth (\pages -> { model | pages = pages }) PageAction <|
+    case route of
+
+      Home ->
+        Home.init
+          |> mapBoth (\home -> { pages | home = home }) HomeAction
+
+      Cities ->
+        Cities.init
+          |> mapBoth (\cities -> { pages | cities = cities }) CitiesAction
+
+      _ ->
+        res pages none
 
 
-pushPath : String -> Effects Action
-pushPath path =
-  History.setPath path
-    |> Task.map (\_ -> NoOp)
-    |> Effects.task
+updatePage : PageAction -> Pages -> Response Pages PageAction
+updatePage action pages =
+  case action of
 
-currentRouteSignal : Signal Action
-currentRouteSignal =
-  Signal.map (LatestRoute << RouteParser.match R.routeParsers) History.path
+    HomeAction a ->
+      Home.update a pages.home
+        |> mapBoth (\home -> { pages | home = home }) HomeAction
+
+    CitiesAction a ->
+      Cities.update a pages.cities
+        |> mapBoth (\cities -> { pages | cities = cities }) CitiesAction
+
+    PageNoOp ->
+      res pages none
